@@ -14,15 +14,22 @@ class _HomeConverState extends State<HomeConver> {
   final realControl = TextEditingController();
   final dolarControl = TextEditingController();
   final euroControl = TextEditingController();
+  final ieneControl =  TextEditingController();
+  final yuanControl = TextEditingController();
+
 
   double dolar = 0;
   double euro = 0;
+  double iene = 0;
+  double yuan = 0;
 
   @override
   void dispose() {
     realControl.dispose();
     dolarControl.dispose();
     euroControl.dispose();
+    ieneControl.dispose();
+    yuanControl.dispose();
     super.dispose();
   }
 
@@ -39,6 +46,8 @@ class _HomeConverState extends State<HomeConver> {
               if (snapshot.connectionState == ConnectionState.done) {
                 dolar = double.parse(snapshot.data!['USDBRL']['bid']);
                 euro = double.parse(snapshot.data!['EURBRL']['bid']);
+                iene = double.parse(snapshot.data!['JPYBRL']['bid']);
+                yuan = double.parse(snapshot.data!['CNYBRL']['bid']);
                 // dolar = snapshot.data!['USD']['buy'];
                 // euro = snapshot.data!['EUR']['buy'];
                 return SingleChildScrollView(
@@ -48,17 +57,24 @@ class _HomeConverState extends State<HomeConver> {
                     children: <Widget>[
                       const Icon(
                         Icons.monetization_on_outlined,
+                        color: Colors.blue,
                         size: 120,
                       ),
                       const SizedBox(height: 20),
                       currencyTextField(
-                          'reais ', 'R\$ ', realControl, _convertReal),
+                          'Reais ', 'R\$ ', realControl, _convertReal),
                       const SizedBox(height: 20),
                       currencyTextField(
                           'Dolares', 'US\$ ', dolarControl, _convertDolar),
                       const SizedBox(height: 20),
                       currencyTextField(
                           'Euros', '€ ', euroControl, _convertEuro),
+                      const SizedBox(height: 20),
+                      currencyTextField(
+                          'Ienes ', '¥ ', ieneControl, _convertIene),
+                      const SizedBox(height: 20),
+                      currencyTextField(
+                          'Yuan ', ' ¥ ', yuanControl, _convertYuan),
                     ],
                   ),
                 );
@@ -101,6 +117,8 @@ class _HomeConverState extends State<HomeConver> {
     double real = double.parse(text);
     dolarControl.text = (real / dolar).toStringAsFixed(2);
     euroControl.text = (real / euro).toStringAsFixed(2);
+    ieneControl.text = (real / iene).toStringAsFixed(2);
+    yuanControl.text = (real / yuan).toStringAsFixed(2);
   }
 
   void _convertDolar(String text) {
@@ -112,6 +130,8 @@ class _HomeConverState extends State<HomeConver> {
     double dolar = double.parse(text);
     realControl.text = (this.dolar * dolar).toStringAsFixed(2);
     euroControl.text = ((this.dolar * dolar) / euro).toStringAsFixed(2);
+    ieneControl.text = ((this.dolar * dolar) / iene).toStringAsFixed(2);
+    yuanControl.text = ((this.dolar * dolar) / iene).toStringAsFixed(2);
   }
 
   void _convertEuro(String text) {
@@ -123,12 +143,43 @@ class _HomeConverState extends State<HomeConver> {
     double euro = double.parse(text);
     realControl.text = (this.euro * euro).toStringAsFixed(2);
     dolarControl.text = ((this.euro * euro) / dolar).toStringAsFixed(2);
+    ieneControl.text = ((this.euro * euro) / iene).toStringAsFixed(2);
+    yuanControl.text = ((this.euro * euro) / yuan).toStringAsFixed(2);
+  }
+
+  void _convertIene(String text) {
+    if (text.trim().isEmpty) {
+      _clearFields();
+      return;
+    }
+
+    double iene = double.parse(text);
+    realControl.text = (this.iene * iene).toStringAsFixed(2);
+    dolarControl.text = ((this.iene * iene) / dolar).toStringAsFixed(2);
+    euroControl.text = ((this.iene * iene) / euro).toStringAsFixed(2);
+    yuanControl.text = ((this.iene * iene) / yuan).toStringAsFixed(2);
+  }
+
+  void _convertYuan(String text) {
+    if (text.trim().isEmpty) {
+      _clearFields();
+      return;
+    }
+
+    double yuan = double.parse(text);
+    realControl.text = (this.yuan * yuan).toStringAsFixed(2);
+    dolarControl.text = ((this.yuan * yuan) / dolar).toStringAsFixed(2);
+    euroControl.text = ((this.yuan * yuan) / euro).toStringAsFixed(2);
+    ieneControl.text = ((this.yuan * yuan) / iene).toStringAsFixed(2);
+
   }
 
   void _clearFields() {
     realControl.clear();
     dolarControl.clear();
     euroControl.clear();
+    ieneControl.clear();
+    yuanControl.clear();
   }
 }
 
@@ -137,7 +188,7 @@ Future<Map> getData() async {
   //* https://docs.awesomeapi.com.br/api-de-moedas
 
   const requestApi =
-      "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL";
+      "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,CNY-BRL,JPY-BRL";
   var response = await http.get(Uri.parse(requestApi));
   return jsonDecode(response.body);
 
@@ -169,8 +220,26 @@ Future<Map> getData() async {
       "ask": "5.7293",
       "timestamp": "1679660999",
       "create_date": "2023-03-24 09:29:59"
+    },
+
+    "BTCBRL": {
+        "code": "BTC",
+        "codein": "BRL",
+        "name": "Bitcoin/Real Brasileiro",
+        "high": "360000",
+        "low": "340500",
+        "varBid": "17072.9",
+        "pctChange": "4.98",
+        "bid": "359973.9",
+        "ask": "359974",
+        "timestamp": "1618315092",
+        "create_date": "2021-04-13 08:58:12"
     }
   };
+
+  <BRL-CNY>Real Brasileiro/Yuan Chinês</BRL-CNY>
+  <BRL-JPY>Real Brasileiro/Iene Japonês</BRL-JPY>
+  <XAU>Ouro</XAU>
 
   return jsonDecode(jsonEncode(response));
  */
